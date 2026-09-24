@@ -60,15 +60,14 @@
         return $count;
     }
 
-    function findStudentByName($students, $name) {
-        foreach ($students as $student) {
-            if (stripos($student["name"], $name) !== false) {
-                return $student;
+    function findStudentByName($student, $name) {
+        foreach ($student as $s) {
+            $fullName = explode(" ", $s["name"]);
+            if ($fullName[count($fullName) - 1] == $name) {
+                return $s["name"];
             }
         }
-
         return null;
-    }
 
     echo "Danh sách sinh viên sau khi lọc: <br>";
 
