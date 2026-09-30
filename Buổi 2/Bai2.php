@@ -1,17 +1,40 @@
 <?php
     class Movie{
-        public $id;
-        public $title;
-        public $price;
-        public $totalSeats;
-        public $availableSeats;
+        private $id;
+        private $title;
+        private $price;
+        private $totalSeats;
+        private $availableSeats;
 
         public function __construct($id, $title, $price, $totalSeats){
+            if ($price <= 0 || $totalSeats <= 0) {
+                throw new InvalidArgumentException();
+            }
             $this->id = $id;
             $this->title = $title;
             $this->price = $price;
             $this->availableSeats = $totalSeats;
             $this->totalSeats = $totalSeats;
+        }
+
+        public function getId(){
+            return $this->id;
+        }
+
+        public function getTitle(){
+            return $this->title;
+        }
+
+        public function getPrice(){
+            return $this->price;
+        }
+
+        public function getTotalSeats(){
+            return $this->totalSeats;
+        }
+
+        public function getAvailableSeats(){
+            return $this->availableSeats;
         }
 
         public function bookTicket($quantity){
@@ -51,9 +74,13 @@
         }
     
 
-        public static function findMovieById($movies, $id){
+        public static function findMovieById($movies, $id) {
+            if (empty($movies)) {
+                return null;
+            }
+
             foreach ($movies as $movie) {
-                if ($movie->id == $id) {
+                if ($movie->getId() == $id) {
                     return $movie;
                 }
             }
@@ -62,6 +89,10 @@
         }
 
         public static function getTotalRevenue($movies){
+            if (empty($movies)) {
+                return 0;
+            }
+
             $totalRevenue = 0;
             foreach ($movies as $movie) {
                 $totalRevenue += $movie->getRevenue();
@@ -74,14 +105,14 @@
                 return null;
             }
 
-            $bestSellingMovie = $movies[0];
-
+            $bestSellingMovie = null;
+            $maxSoldSeats = 0;
             foreach ($movies as $movie) {
-                if ($movie->getSoldSeats() > $bestSellingMovie->getSoldSeats()) {
+                if ($movie->getSoldSeats() > $maxSoldSeats) {
+                    $maxSoldSeats = $movie->getSoldSeats();
                     $bestSellingMovie = $movie;
                 }
             }
-
             return $bestSellingMovie;
         }
     }
@@ -129,7 +160,7 @@
 
     $bestSellingMovie = Movie::getBestSellingMovie($movies);
     if ($bestSellingMovie) {
-        echo "Bộ phim bán chạy nhất: " . $bestSellingMovie->title . ", với số vé đã bán ra: " . $bestSellingMovie->getSoldSeats() . "<br>";
+        echo "Bộ phim bán chạy nhất: " . $bestSellingMovie->getTitle() . ", với số vé đã bán ra: " . $bestSellingMovie->getSoldSeats() . "<br>";
 
     } else {
         echo "Chưa có vé nào được bán ra!";
