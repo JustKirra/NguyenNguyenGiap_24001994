@@ -4,8 +4,8 @@ USE shopping_cart;
 CREATE TABLE IF NOT EXISTS cart_items (
 	id INT PRIMARY KEY AUTO_INCREMENT,
     name VARCHAR(100) NOT NULL,
-    price DECIMAL(10,2) NOT NULL,
-    quantity INT NOT NULL
+    price DECIMAL(10,2) NOT NULL CHECK (price >= 0),
+    quantity INT NOT NULL CHECK (quantity >= 0)
 );
 
 # Thêm 5 sản phẩm vào bảng
