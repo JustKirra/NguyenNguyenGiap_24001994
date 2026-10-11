@@ -1,0 +1,79 @@
+<?php
+require_once 'model/product.php';
+require_once 'view/header.php';
+
+$id = $_GET['id'] ?? null;
+
+if (!$id) {
+    header("Location: product_list.php");
+    exit();
+}
+
+$product = getProductById($id);
+
+if (!$product) {
+    echo "<h3>Sản phẩm không tồn tại!</h3>";
+    echo "<a href='product_list.php'>Quay lại danh sách</a>";
+    require_once 'view/footer.php';
+    exit();
+}
+
+$errors = [];
+
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    $name = trim($_POST['name']);
+    $price = $_POST['price'];
+    $quantity = $_POST['quantity'];
+
+    // Kiểm tra dữ liệu
+    if (empty($name)) {
+        $errors[] = "Tên sản phẩm không được để rỗng!";
+    }
+    if ($price <= 0) {
+        $errors[] = "Giá sản phẩm phải lớn hơn 0!";
+    }
+    if ($quantity < 0) {
+        $errors[] = "Số lượng phải lớn hơn hoặc bằng 0!";
+    }
+
+    if (empty($errors)) {
+        updateProduct($id, $name, $price, $quantity);
+        header("Location: product_list.php");
+        exit();
+    }
+}
+?>
+
+<?php if (!empty($errors)): ?>
+    <div style="color: red;">
+        <ul>
+            <?php foreach ($errors as $error): ?>
+                <li><?= $error ?></li>
+            <?php endforeach; ?>
+        </ul>
+    </div>
+<?php endif; ?>
+
+<form method="POST" action="product_edit.php?id=<?= $product['id'] ?>">
+    <div class="row">
+        <label>Tên sản phẩm:</label><br>
+        <input type="text" name="name" value="<?= $_POST['name'] ?? $product['name'] ?>">
+    </div>
+    <div class="row">
+        <label>Giá:</label><br>
+        <input type="number" name="price" value="<?= $_POST['price'] ?? $product['price'] ?>">
+    </div>
+    <div class="row">
+        <label>Số lượng:</label><br>
+        <input type="number" name="quantity" value="<?= $_POST['quantity'] ?? $product['quantity'] ?>">
+    </div>
+    <div class="row buttons">
+        <button type="submit" style="margin-right: 25px;">Cập nhật</button>
+        <a href="product_list.php"><button type="button">Quay lại</button></a>
+    </div>
+</form>
+
+<?php
+// Nhúng footer
+require_once 'view/footer.php';
+?>
