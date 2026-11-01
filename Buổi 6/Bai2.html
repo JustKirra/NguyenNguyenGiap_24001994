@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Bài 2 - Đặt vé xem phim</title>
+  <script src="https://unpkg.com/vue@3.5.13/dist/vue.global.js"></script>
+  <style>
+    body { font-family: Arial, sans-serif; background: #f3f4f6; }
+    .box { max-width: 520px; margin: 24px auto; background: #fff; padding: 20px; border-radius: 10px; }
+    .field { margin-bottom: 12px; }
+    label.title { display: block; font-weight: bold; margin-bottom: 4px; }
+    input[type=text], input[type=number], select { width: 100%; padding: 6px; box-sizing: border-box; }
+    .qty { display: flex; gap: 6px; }
+    .error { color: red; font-size: 13px; }
+    .total { font-size: 18px; font-weight: bold; color: #2563eb; }
+    button:disabled { opacity: .5; cursor: not-allowed; }
+    .confirm { margin-top: 16px; padding: 12px; border: 1px solid #16a34a; background: #f0fdf4; border-radius: 8px; }
+  </style>
+</head>
+<body>
+  <div id="app" class="box">
+    <h2>Đặt vé xem phim</h2>
+
+    <form @submit.prevent="datVe">
+      <div class="field">
+        <label class="title">Họ tên khách hàng</label>
+        <input type="text" v-model.trim="hoTen" placeholder="Nhập họ tên">
+      </div>
+
+      <div class="field">
+        <label class="title">Suất chiếu</label>
+        <select v-model="suatChieu">
+          <option v-for="s in dsSuatChieu" :key="s" :value="s">{{ s }}</option>
+        </select>
+      </div>
+
+      <div class="field">
+        <label class="title">Loại vé</label>
+        <label><input type="radio" value="thuong" v-model="loaiVe"> Vé thường (70.000 đồng)</label>
+        <label><input type="radio" value="vip" v-model="loaiVe"> Vé VIP (100.000 đồng)</label>
+      </div>
+
+      <div class="field">
+        <label class="title">Số lượng (1 - 10)</label>
+        <div class="qty">
+          <button type="button" @click="giam">-</button>
+          <input type="number" v-model.number="soLuong">
+          <button type="button" @click="tang">+</button>
+        </div>
+        <div class="error" v-if="!soLuongHopLe">Số lượng phải là số nguyên từ 1 đến 10.</div>
+      </div>
+
+      <div class="field">
+        <label><input type="checkbox" v-model="combo"> Combo bắp nước (+45.000 đồng)</label>
+      </div>
+
+      <p class="total">Tổng tiền: {{ dinhDang(tongTien) }}</p>
+
+      <button type="submit" :disabled="!choPhepDat">Đặt vé</button>
+      <button type="button" @click="datLai">Đặt lại</button>
+    </form>
+
+    <div class="confirm" v-if="xacNhan">
+      <h3>Xác nhận đặt vé</h3>
+      <p>Khách hàng: <b>{{ xacNhan.hoTen }}</b></p>
+      <p>Suất chiếu: {{ xacNhan.suatChieu }}</p>
+      <p>Loại vé: {{ xacNhan.loaiVe }} x {{ xacNhan.soLuong }}</p>
+      <p>Combo bắp nước: {{ xacNhan.combo ? 'Có' : 'Không' }}</p>
+      <p>Tổng tiền: <b>{{ dinhDang(xacNhan.tongTien) }}</b></p>
+    </div>
+  </div>
+
+  <script>
+    const { createApp } = Vue
+
+    createApp({
+      data() {
+        return {
+          hoTen: '',
+          dsSuatChieu: ['09:30', '14:00', '19:30', '22:00'],
+          suatChieu: '09:30',
+          loaiVe: 'thuong',
+          soLuong: 1,
+          combo: false,
+          xacNhan: null
+        }
+      },
+      computed: {
+        giaVe() {
+          return this.loaiVe === 'vip' ? 100000 : 70000
+        },
+        soLuongHopLe() {
+          return Number.isInteger(this.soLuong) && this.soLuong >= 1 && this.soLuong <= 10
+        },
+        tienCombo() {
+          return this.combo ? 45000 : 0
+        },
+        // Tổng tiền = Giá vé × Số lượng + Tiền combo
+        tongTien() {
+          if (!this.soLuongHopLe) return 0
+          return this.giaVe * this.soLuong + this.tienCombo
+        },
+        choPhepDat() {
+          return this.hoTen !== '' && this.soLuongHopLe
+        }
+      },
+      methods: {
+        tang() {
+          if (!this.soLuongHopLe) this.soLuong = 1
+          else if (this.soLuong < 10) this.soLuong++
+        },
+        giam() {
+          if (!this.soLuongHopLe) this.soLuong = 1
+          else if (this.soLuong > 1) this.soLuong--
+        },
+        datVe() {
+          if (!this.choPhepDat) return
+          this.xacNhan = {
+            hoTen: this.hoTen,
+            suatChieu: this.suatChieu,
+            loaiVe: this.loaiVe === 'vip' ? 'Vé VIP' : 'Vé thường',
+            soLuong: this.soLuong,
+            combo: this.combo,
+            tongTien: this.tongTien
+          }
+        },
+        datLai() {
+          this.hoTen = ''
+          this.suatChieu = this.dsSuatChieu[0]
+          this.loaiVe = 'thuong'
+          this.soLuong = 1
+          this.combo = false
+          this.xacNhan = null
+        },
+        dinhDang(so) {
+          return so.toLocaleString('vi-VN') + ' đồng'
+        }
+      }
+    }).mount('#app')
+  </script>
+</body>
+</html>

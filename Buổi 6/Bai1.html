@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+    
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Thẻ sinh viên</title>
+    <!-- Nhúng Vue 3 -->
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+</head>
+
+<body>
+
+    <!-- Hiển thị dữ liệu -->
+    <div id="app">
+        <!-- 1. Ảnh đại diện -->
+        <img v-bind:src="anhDaiDien" v-bind:alt="hoTen" width="100">
+
+        <!-- 2. Họ tên + lớp -->
+        <h2>{{ hoTen }}</h2>
+        <p>Mã SV: {{ maSV }}</p>
+        <p>Lớp: <span v-text="lop"></span></p>
+
+        <!-- 3. Xếp loại và màu sắc nhận diện -->
+        <p>Điểm TB: {{ diemTB }}</p>
+        <p>Xếp loại:
+            <span v-if="diemTB >= 8" style="color: green; font-weight: bold;">Giỏi</span>
+            <span v-else-if="diemTB >= 6.5" style="color: blue; font-weight: bold">Khá</span>
+            <span v-else-if="diemTB >= 5" style="color: yellow; font-weight: bold;">Trung bình</span>
+            <span v-else style="color: red; font-weight: bold;">Chưa đạt</span>
+        </p>
+
+        <!-- 4. Trạng thái học -->
+        <p>Trạng thái học:
+            <span v-if="dangHoc">Đang học</span>
+            <span v-else>Đã nghỉ</span>
+        </p>
+
+        <!-- 5. Bật/tắt giới thiệu -->
+        <button @click="showIntro = !showIntro">
+            {{ showIntro ? 'Ẩn giới thiệu' : 'Hiện giới thiệu' }}
+        </button>
+
+        <!-- Nội dung giới thiệu -->
+        <div v-show="showIntro" style="margin-top: 10px; padding: 10px; background: #f0f0f0;">
+            <p>Giới thiệu: Có sở thích với việc lập trình web</p>
+    </div>
+
+    <!-- Tạo dữ liệu với Vue -->
+    <script>
+        const { createApp } = Vue;
+
+        createApp({
+            data() {
+                return{
+                    maSV: '24001994',
+                    hoTen: 'Nguyễn Nguyên Giáp',
+                    lop: 'K69A3',
+                    anhDaiDien: 'https://api.dicebear.com/10.x/dylan/svg?seed=Aneka',
+                    diemTB: 9,
+                    dangHoc: true,
+                    showIntro: false
+                }
+            }
+        }).mount('#app');
+    </script>
+</body>
+</html>
