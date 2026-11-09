@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Bài 3 - Giỏ hàng với props và $emit</title>
+<script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+<style>
+  body { font-family: Arial, sans-serif; max-width: 800px; margin: 20px auto; padding: 0 12px; }
+  table { width: 100%; border-collapse: collapse; }
+  th, td { border: 1px solid #ccc; padding: 8px; text-align: left; }
+  th { background: #f0f0f0; }
+  .sl { display: inline-block; min-width: 32px; text-align: center; }
+  button { padding: 4px 10px; cursor: pointer; }
+  button:disabled { cursor: not-allowed; opacity: .5; }
+  .tong { margin-top: 12px; padding: 10px; background: #eef5ff; border-radius: 6px; }
+  .trong { text-align: center; color: #777; padding: 20px; }
+  .loi { color: #d9534f; }
+</style>
+</head>
+<body>
+<div id="app">
+  <h1>Giỏ hàng</h1>
+  <p class="loi" v-if="thongBaoLoi">{{ thongBaoLoi }}</p>
+
+  <p class="trong" v-if="gioHang.length === 0">Giỏ hàng trống</p>
+
+  <table v-else>
+    <thead>
+      <tr><th>Sản phẩm</th><th>Đơn giá</th><th>Số lượng</th><th>Thành tiền</th><th></th></tr>
+    </thead>
+    <tbody>
+      <dong-gio-hang
+        v-for="m in gioHang"
+        :key="m.id"
+        :item="m"
+        @doi-so-luong="xuLyDoiSoLuong"
+        @yeu-cau-xoa="xuLyXoa">
+      </dong-gio-hang>
+    </tbody>
+  </table>
+
+  <div class="tong" v-if="gioHang.length > 0">
+    Tổng số lượng: <strong>{{ tongSoLuong }}</strong><br>
+    Tổng tiền: <strong>{{ tongTien.toLocaleString('vi-VN') }} đồng</strong>
+  </div>
+</div>
+
+<script src="components/DongGioHang.js"></script>
+<script>
+const app = Vue.createApp({
+  data() {
+    return {
+      thongBaoLoi: '',
+      gioHang: [
+        { id: 1, ten: 'Bút', donGia: 5000, soLuong: 2 },
+        { id: 2, ten: 'Vở', donGia: 12000, soLuong: 3 }
+      ]
+    };
+  },
+  computed: {
+    tongSoLuong() {
+      return this.gioHang.reduce((t, m) => t + m.soLuong, 0);
+    },
+    tongTien() {
+      return this.gioHang.reduce((t, m) => t + m.donGia * m.soLuong, 0);
+    }
+  },
+  methods: {
+    xuLyDoiSoLuong(id, soLuongMoi) {
+      const hopLe = Number.isInteger(soLuongMoi) && soLuongMoi >= 1 && soLuongMoi <= 99;
+      const muc = this.gioHang.find(m => m.id === id);
+      if (!muc || !hopLe) {
+        this.thongBaoLoi = 'Số lượng phải là số nguyên từ 1 đến 99.';
+        return;
+      }
+      this.thongBaoLoi = '';
+      muc.soLuong = soLuongMoi;
+    },
+    xuLyXoa(id) {
+      this.thongBaoLoi = '';
+      this.gioHang = this.gioHang.filter(m => m.id !== id);
+    }
+  }
+});
+app.component('dong-gio-hang', DongGioHang);
+app.mount('#app');
+</script>
+</body>
+</html>

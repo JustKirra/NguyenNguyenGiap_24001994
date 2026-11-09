@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Bài 2 - Danh mục sản phẩm bằng component</title>
+<script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+<style>
+  body { font-family: Arial, sans-serif; max-width: 1000px; margin: 20px auto; padding: 0 12px; }
+  .luoi { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 16px; align-items: start; }
+  .the { border: 1px solid #ccc; border-radius: 8px; padding: 12px; }
+  .the img { width: 100%; border-radius: 6px; }
+  .gia { color: #d9534f; font-weight: bold; }
+  .nhan-het { background: #d9534f; color: #fff; padding: 2px 8px; border-radius: 10px; font-size: 12px; margin-left: 6px; }
+  .mo-ta { background: #f6f6f6; padding: 8px; border-radius: 6px; }
+  button { padding: 6px 10px; margin-right: 6px; cursor: pointer; }
+  button:disabled { cursor: not-allowed; opacity: .5; }
+</style>
+</head>
+<body>
+<div id="app">
+  <h1>Danh mục sản phẩm</h1>
+  <div class="luoi">
+    <the-san-pham
+      v-for="sp in sanPham"
+      :key="sp.id"
+      :ten="sp.ten"
+      :gia="sp.gia"
+      :anh="sp.anh"
+      :mo-ta="sp.moTa"
+      :ton-kho="sp.tonKho">
+    </the-san-pham>
+  </div>
+</div>
+
+<script src="components/TheSanPham.js"></script>
+<script>
+const app = Vue.createApp({
+  data() {
+    return {
+      sanPham: [
+        { id: 1, ten: 'Laptop Dell', gia: 15000000, anh: 'https://laptops.vn/wp-content/uploads/2026/10/dell-16-premium-da16250-2025-1.webp',
+          moTa: 'Laptop văn phòng, RAM 16GB, SSD 512GB.', tonKho: 5 },
+        { id: 2, ten: 'Điện thoại Samsung', gia: 9000000,
+          moTa: 'Màn hình AMOLED 6.5 inch, pin 5000mAh.', tonKho: 0 },
+        { id: 3, ten: 'Tai nghe Bluetooth', gia: 650000,
+          moTa: 'Chống ồn, pin dùng 20 giờ.', tonKho: 18 },
+        { id: 4, ten: 'Chuột không dây', gia: 250000,
+          moTa: 'Chuột quang không dây, kết nối USB.', tonKho: 30 }
+      ]
+    };
+  }
+});
+app.component('the-san-pham', TheSanPham);
+app.mount('#app');
+</script>
+</body>
+</html>
